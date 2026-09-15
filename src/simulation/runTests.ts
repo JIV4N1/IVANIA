@@ -1,0 +1,24 @@
+import { runActivitySummaryMoveTests } from '../activity/testActivitySummaryMoves';
+import { runActivitySummarySelectorTests } from '../activity/testActivitySummarySelector';
+import { runActivitySummaryFormatterTests } from '../activity/testActivitySummaryFormatter';
+import { runActivitySummaryTests } from '../activity/testActivitySummary';
+import { runTwoPhaseTickTests } from './testTwoPhaseTick';
+import { runSocialSelectionTests } from './testSocialSelection';
+import { runWorkScheduleTests } from './testWorkSchedule';
+import { runIsolatedPersonalityTests } from './testPersonalitySocial';
+import { runIsolatedSleepTests } from './testSleepCycle';
+import { runIsolatedBiologicalTests } from './testBiologicalBalance';
+import { runIntegrityTests } from './testIntegrity';
+
+runIsolatedPersonalityTests();
+runIsolatedSleepTests();
+runIsolatedBiologicalTests();
+runIntegrityTests();
+runWorkScheduleTests();
+runSocialSelectionTests();
+runTwoPhaseTickTests();
+runActivitySummaryTests();
+runActivitySummaryFormatterTests();
+runActivitySummaryMoveTests();
+runActivitySummarySelectorTests();
+console.log('All tests passed.');
