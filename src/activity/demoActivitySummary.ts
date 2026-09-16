@@ -9,9 +9,10 @@ import { MemoryManager } from '../memory/MemoryManager';
 import { RelationshipManager } from '../relationships/RelationshipManager';
 import { ActivitySummary } from './ActivitySummary';
 import { ActivitySummaryService } from './ActivitySummaryService';
+import { ActivitySummaryPresenter } from './ActivitySummaryPresenter';
 
 /** Separate in-memory demo; uses the unchanged simulation engines. */
-export function runActivitySummaryDemo(): ActivitySummary {
+export function runActivitySummaryDemo(options: { debug?: boolean; full?: boolean } = {}): ActivitySummary {
   const makeAgent = (id: string, name: string) => new Agent(id, name,
     { extroversion: 80, curiosity: 70, kindness: 70, impulsivity: 50,
       sociability: 70, patience: 60, confidence: 70 },
@@ -28,58 +29,64 @@ export function runActivitySummaryDemo(): ActivitySummary {
 
   // Advance to the hypothetical last connection: day 1, 10:00.
   for (let tick = 0; tick < 24; tick++) engine.tick();
-  const fromDay = clock.getDay();
-  const fromHour = clock.getHour();
-  const fromMinute = clock.getMinute();
+  const lastConnection = { day: clock.getDay(), hour: clock.getHour(), minute: clock.getMinute() };
   // Continue without changing agents or decisions because of that timestamp.
   for (let tick = 0; tick < 96; tick++) engine.tick();
+  const consultation = { day: clock.getDay(), hour: clock.getHour(), minute: clock.getMinute() };
   const service = new ActivitySummaryService(events);
-  const summary = service.getSummaryForAgent('agent-ana', fromDay, fromHour, fromMinute);
-  console.log(`Consulta: ${clock.getFormattedTime()} | Ana: desde Día ${fromDay} - 10:00`);
-  console.log('Mientras estabas fuera...');
-  console.log(`${summary.totalEvents} eventos relacionados contigo`);
-  console.log(`${summary.importantEvents} importantes`);
-  const items = service.getFormattedSummaryForAgent('agent-ana', fromDay, fromHour, fromMinute);
-  const brief = service.getBriefSummaryForAgent('agent-ana', fromDay, fromHour, fromMinute);
-  const coincidentSocial = summary.events.filter(event =>
-    event.type === 'AGENTS_SOCIALIZED' && event.day === 1 && event.hour === 17 &&
-    (event.minute === 5 || event.minute === 45));
-  console.log('Eventos sociales coincidentes (agentIds: iniciador, destinatario):');
-  for (const event of coincidentSocial) {
-    console.log(`${event.id} | Día ${event.day} ${String(event.hour).padStart(2, '0')}:${String(event.minute).padStart(2, '0')} | [${event.agentIds.join(', ')}] | ${event.locationId} | ${event.description}`);
-  }
-  const movesBefore = summary.events.filter(event => event.type === 'AGENT_MOVED').length;
-  const movesAfter = items.filter(item => item.type === 'AGENT_MOVED').length;
-  const omitted = movesBefore - movesAfter;
-  // Group boundaries are unchanged: restoring each hidden MOVE reconstructs
-  // the previous formatter's item count without duplicating its implementation.
-  console.log(`Comparación: ${summary.totalEvents} eventos | ${items.length + omitted} items antes → ${items.length} después`);
-  console.log(`MOVE: ${movesBefore} antes | ${movesAfter} conservados | ${omitted} omitidos`);
-  console.log('Se conserva la última llegada al lugar de la siguiente actividad del mismo agente.');
-  console.log('Se omiten trayectos intermedios o sin actividad posterior en ese destino.');
-  console.log(`Resumen completo: ${items.length} items`);
-  console.log(`Resumen breve: ${brief.length} seleccionados | ${items.length - brief.length} omitidos (máximo 8)`);
-  console.log('Los items omitidos siguen disponibles en el resumen completo.');
-  const time = (hour: number, minute: number) =>
-    `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-  const highSocial = (item: typeof items[number]) =>
-    item.type === 'AGENTS_SOCIALIZED' && item.importance >= 40;
-  console.log(`Interacciones sociales importantes: ${brief.filter(highSocial).length} de ${items.filter(highSocial).length} seleccionadas`);
-  if (brief.length > 0) {
-    const first = brief[0];
-    const last = brief[brief.length - 1];
-    console.log(`Cobertura temporal: Día ${first.startDay} ${time(first.startHour, first.startMinute)} a Día ${last.startDay} ${time(last.startHour, last.startMinute)}.`);
-    console.log('Los espacios restantes se distribuyen por distancia temporal dentro de cada grupo de prioridad.');
-  }
-  for (const item of brief) {
-    const start = time(item.startHour, item.startMinute);
-    const end = time(item.endHour, item.endMinute);
-    const interval = item.startDay !== item.endDay
-      ? `Día ${item.startDay} ${start}–Día ${item.endDay} ${end}`
-      : start === end ? start : `${start}–${end}`;
-    console.log(`${interval} | ${item.description}`);
+  const summary = service.getSummaryForAgent('agent-ana',
+    lastConnection.day, lastConnection.hour, lastConnection.minute);
+  const items = service.getFormattedSummaryForAgent('agent-ana',
+    lastConnection.day, lastConnection.hour, lastConnection.minute);
+  const brief = service.getBriefSummaryForAgent('agent-ana',
+    lastConnection.day, lastConnection.hour, lastConnection.minute);
+  const displayed = options.full ? items : brief;
+  const presentation = new ActivitySummaryPresenter().present(
+    displayed, items.length, lastConnection, consultation);
+  console.log(presentation);
+
+  if (options.debug) {
+    const movesBefore = summary.events.filter(event => event.type === 'AGENT_MOVED').length;
+    const movesAfter = items.filter(item => item.type === 'AGENT_MOVED').length;
+    const omittedMoves = movesBefore - movesAfter;
+    const highSocial = (item: typeof items[number]) =>
+      item.type === 'AGENTS_SOCIALIZED' && item.importance >= 40;
+    const coincidentSocial = summary.events.filter(event =>
+      event.type === 'AGENTS_SOCIALIZED' && event.day === 1 && event.hour === 17 &&
+      (event.minute === 5 || event.minute === 45));
+    const time = (hour: number, minute: number) =>
+      `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    const diagnostics = [
+      'Diagnóstico',
+      `Consulta: ${clock.getFormattedTime()} | Ana: desde Día ${lastConnection.day} - ${time(lastConnection.hour, lastConnection.minute)}`,
+      `Eventos filtrados: ${summary.totalEvents} | importantes: ${summary.importantEvents}`,
+      `Comparación: ${summary.totalEvents} eventos | ${items.length + omittedMoves} items antes → ${items.length} después`,
+      `MOVE: ${movesBefore} antes | ${movesAfter} conservados | ${omittedMoves} omitidos`,
+      'Se conserva la última llegada al lugar de la siguiente actividad del mismo agente.',
+      'Se omiten trayectos intermedios o sin actividad posterior en ese destino.',
+      `Resumen completo: ${items.length} items`,
+      `Modo mostrado: ${options.full ? 'completo' : 'breve'}`,
+      `Presentación actual: ${displayed.length} mostrados | ${items.length - displayed.length} omitidos`,
+      `Selección breve: ${brief.length} seleccionados | ${items.length - brief.length} no seleccionados (máximo 8)`,
+      'Los items no seleccionados para el resumen breve siguen disponibles en el resumen completo.',
+      `Interacciones sociales importantes en el resumen breve: ${brief.filter(highSocial).length} de ${items.filter(highSocial).length} seleccionadas`,
+      'Eventos sociales coincidentes (agentIds: iniciador, destinatario):',
+      ...coincidentSocial.map(event =>
+        `${event.id} | Día ${event.day} ${time(event.hour, event.minute)} | [${event.agentIds.join(', ')}] | ${event.locationId} | ${event.description}`),
+    ];
+    if (brief.length > 0) {
+      const first = brief[0];
+      const last = brief[brief.length - 1];
+      diagnostics.push(
+        `Cobertura temporal del resumen breve: Día ${first.startDay} ${time(first.startHour, first.startMinute)} a Día ${last.startDay} ${time(last.startHour, last.startMinute)}.`,
+        'Los espacios restantes se distribuyen por distancia temporal dentro de cada grupo de prioridad.');
+    }
+    console.log(`\n${diagnostics.join('\n')}`);
   }
   return summary;
 }
 
-if (require.main === module) runActivitySummaryDemo();
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  runActivitySummaryDemo({ debug: args.includes('--debug'), full: args.includes('--full') });
+}

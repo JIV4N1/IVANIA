@@ -1,5 +1,6 @@
 import { runActivitySummaryMoveTests } from '../activity/testActivitySummaryMoves';
 import { runActivitySummarySelectorTests } from '../activity/testActivitySummarySelector';
+import { runActivitySummaryPresenterTests } from '../activity/testActivitySummaryPresenter';
 import { runActivitySummaryFormatterTests } from '../activity/testActivitySummaryFormatter';
 import { runActivitySummaryTests } from '../activity/testActivitySummary';
 import { runTwoPhaseTickTests } from './testTwoPhaseTick';
@@ -22,5 +23,6 @@ runActivitySummaryTests();
 runActivitySummaryFormatterTests();
 runActivitySummaryMoveTests();
 runActivitySummarySelectorTests();
+runActivitySummaryPresenterTests();
 runSocialEventCharacterizationTests();
 console.log('All tests passed.');
