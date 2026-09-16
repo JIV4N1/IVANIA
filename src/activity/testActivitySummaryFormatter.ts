@@ -38,7 +38,43 @@ export function runActivitySummaryFormatterTests(): void {
   const c = formatter.format([...work, social, { ...social, id: 'social-2', minute: 35 }], 'ana');
   assert.equal(c.length, 4);
   assert.deepEqual(c.slice(1, 3).map(i => i.importance), [50, 50]);
-  assert.equal(c[1].description, 'Socializaste con Sofía en Cafetería.');
+  assert.equal(c[1].description, 'Sofía inició una conversación contigo en Cafetería.');
+  const initiated = { ...social, id: 'initiated', agentIds: ['ana', 'sofia'],
+    description: 'Ana socialized with Sofía at Cafetería.' };
+  const reciprocal = formatter.format([initiated, social], 'ana');
+  assert.deepEqual(reciprocal.map(i => i.description), [
+    'Iniciaste una conversación con Sofía en Cafetería.',
+    'Sofía inició una conversación contigo en Cafetería.',
+  ]);
+  assert.deepEqual(reciprocal.map(i => i.eventIds), [['initiated'], ['social']]);
+  assert.deepEqual(formatter.format([initiated, social], 'sofia').map(i => i.description), [
+    'Ana inició una conversación contigo en Cafetería.',
+    'Iniciaste una conversación con Ana en Cafetería.',
+  ]);
+  assert.equal(formatter.format([initiated])[0].description,
+    'Se registró una interacción social en Cafetería.');
+  assert.equal(formatter.format([initiated], 'unrelated')[0].description,
+    'Se registró una interacción social en Cafetería.');
+  const unknown = { ...initiated, id: 'unknown', description: 'unparsed social event',
+    locationId: undefined };
+  assert.equal(formatter.format([unknown], 'ana')[0].description,
+    'Iniciaste una conversación con sofia.');
+  assert.equal(formatter.format([unknown], 'sofia')[0].description,
+    'ana inició una conversación contigo.');
+  assert.equal(formatter.format([unknown])[0].description,
+    'Se registró una interacción social.');
+  assert.equal(formatter.format([{ ...unknown, locationId: 'cafe' }])[0].description,
+    'Se registró una interacción social en cafe.');
+  assert.deepEqual(reciprocal.map(i => ({ type: i.type, title: i.title, importance: i.importance,
+    startDay: i.startDay, startHour: i.startHour, startMinute: i.startMinute,
+    endDay: i.endDay, endHour: i.endHour, endMinute: i.endMinute, eventIds: i.eventIds })),
+  [initiated, social].map(event => ({ type: event.type, title: 'Interacción social',
+    importance: event.importance, startDay: event.day, startHour: event.hour,
+    startMinute: event.minute, endDay: event.day, endHour: event.hour,
+    endMinute: event.minute, eventIds: [event.id] })));
+  const socialSnapshot = JSON.stringify([initiated, social, unknown]);
+  formatter.format([initiated, social, unknown], 'ana');
+  assert.equal(JSON.stringify([initiated, social, unknown]), socialSnapshot);
   console.log('Formatter C: social interactions stay individual and important passed.');
 
   const sleep = make('sleep', 'AGENT_WENT_TO_SLEEP', 23, {

@@ -136,10 +136,18 @@ export class ActivitySummaryFormatter {
       case 'AGENT_WENT_TO_SLEEP': return this.atLocation('Te dormiste', event);
       case 'AGENT_WOKE_UP': return this.atLocation('Despertaste', event);
       case 'AGENTS_SOCIALIZED': {
+        const isInitiator = agentId !== undefined && agentId === event.agentIds[0];
+        const isTarget = agentId !== undefined && agentId === event.agentIds[1];
+        if (!isInitiator && !isTarget) {
+          return this.atLocation('Se registró una interacción social', event);
+        }
         const names = event.description.match(/^(.+) socialized with (.+) at (.+)\.$/);
-        const partnerIndex = agentId === event.agentIds[1] ? 0 : 1;
-        const partner = names?.[partnerIndex + 1] ?? event.agentIds[partnerIndex];
-        return this.atLocation(partner ? `Socializaste con ${partner}` : 'Socializaste', event);
+        const partnerIndex = isInitiator ? 1 : 0;
+        const partner = names?.[partnerIndex + 1] || event.agentIds[partnerIndex];
+        if (!partner) return this.atLocation('Se registró una interacción social', event);
+        return this.atLocation(isInitiator
+          ? `Iniciaste una conversación con ${partner}`
+          : `${partner} inició una conversación contigo`, event);
       }
     }
   }
