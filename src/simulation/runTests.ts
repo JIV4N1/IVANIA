@@ -4,6 +4,7 @@ import { runActivitySummaryFormatterTests } from '../activity/testActivitySummar
 import { runActivitySummaryTests } from '../activity/testActivitySummary';
 import { runTwoPhaseTickTests } from './testTwoPhaseTick';
 import { runSocialSelectionTests } from './testSocialSelection';
+import { runSocialEventCharacterizationTests } from './testSocialEventCharacterization';
 import { runWorkScheduleTests } from './testWorkSchedule';
 import { runIsolatedPersonalityTests } from './testPersonalitySocial';
 import { runIsolatedSleepTests } from './testSleepCycle';
@@ -21,4 +22,5 @@ runActivitySummaryTests();
 runActivitySummaryFormatterTests();
 runActivitySummaryMoveTests();
 runActivitySummarySelectorTests();
+runSocialEventCharacterizationTests();
 console.log('All tests passed.');

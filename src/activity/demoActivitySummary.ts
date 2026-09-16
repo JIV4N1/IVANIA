@@ -41,6 +41,13 @@ export function runActivitySummaryDemo(): ActivitySummary {
   console.log(`${summary.importantEvents} importantes`);
   const items = service.getFormattedSummaryForAgent('agent-ana', fromDay, fromHour, fromMinute);
   const brief = service.getBriefSummaryForAgent('agent-ana', fromDay, fromHour, fromMinute);
+  const coincidentSocial = summary.events.filter(event =>
+    event.type === 'AGENTS_SOCIALIZED' && event.day === 1 && event.hour === 17 &&
+    (event.minute === 5 || event.minute === 45));
+  console.log('Eventos sociales coincidentes (agentIds: iniciador, destinatario):');
+  for (const event of coincidentSocial) {
+    console.log(`${event.id} | Día ${event.day} ${String(event.hour).padStart(2, '0')}:${String(event.minute).padStart(2, '0')} | [${event.agentIds.join(', ')}] | ${event.locationId} | ${event.description}`);
+  }
   const movesBefore = summary.events.filter(event => event.type === 'AGENT_MOVED').length;
   const movesAfter = items.filter(item => item.type === 'AGENT_MOVED').length;
   const omitted = movesBefore - movesAfter;
