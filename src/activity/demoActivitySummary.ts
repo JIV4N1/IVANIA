@@ -55,6 +55,15 @@ export function runActivitySummaryDemo(): ActivitySummary {
   console.log('Los items omitidos siguen disponibles en el resumen completo.');
   const time = (hour: number, minute: number) =>
     `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  const highSocial = (item: typeof items[number]) =>
+    item.type === 'AGENTS_SOCIALIZED' && item.importance >= 40;
+  console.log(`Interacciones sociales importantes: ${brief.filter(highSocial).length} de ${items.filter(highSocial).length} seleccionadas`);
+  if (brief.length > 0) {
+    const first = brief[0];
+    const last = brief[brief.length - 1];
+    console.log(`Cobertura temporal: Día ${first.startDay} ${time(first.startHour, first.startMinute)} a Día ${last.startDay} ${time(last.startHour, last.startMinute)}.`);
+    console.log('Los espacios restantes se distribuyen por distancia temporal dentro de cada grupo de prioridad.');
+  }
   for (const item of brief) {
     const start = time(item.startHour, item.startMinute);
     const end = time(item.endHour, item.endMinute);
