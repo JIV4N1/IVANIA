@@ -37,7 +37,11 @@ export async function runServerTests(): Promise<void> {
     assert.deepEqual(initial.moment, { day: 1, hour: 8, minute: 0 });
     assert.deepEqual(Object.keys(initial).sort(), ['agents', 'moment']);
     assert.equal(initial.agents.length, 2);
-    assert.deepEqual(Object.keys(initial.agents[0]).sort(), ['id', 'lastConnection', 'location', 'name']);
+    assert.deepEqual(Object.keys(initial.agents[0]).sort(), ['id', 'lastConnection', 'location', 'locationId', 'name']);
+    for (const agent of initial.agents) {
+      assert.equal(agent.locationId, simulation.world.getAgentById(agent.id)!.locationId);
+      assert.equal(agent.location, simulation.world.getLocationById(agent.locationId)!.name);
+    }
     assert.deepEqual(await get(), initial);
     assert.equal(snapshot(), initialSnapshot);
     assert.equal((await post('return', { agentId: 'agent-ana', selectionPolicy: 'important' })).status, 'no-connection');
@@ -52,6 +56,9 @@ export async function runServerTests(): Promise<void> {
     const sofiaDeparture = registry.get('agent-sofia');
     await post('advance', { minutes: 480 });
     assert.equal(ticks, 109);
+    for (const agent of (await get()).agents) {
+      assert.equal(agent.locationId, simulation.world.getAgentById(agent.id)!.locationId);
+    }
     assert.deepEqual((await get()).moment, { day: 1, hour: 17, minute: 5 });
     await post('departure', { agentId: 'agent-ana' });
     assert.deepEqual(registry.get('agent-sofia'), sofiaDeparture);
@@ -80,7 +87,9 @@ export async function runServerTests(): Promise<void> {
     const confirmation = await post('confirm', { agentId: first.result.agentId, to: first.result.to });
     assert.deepEqual(confirmation.confirmedAt, first.result.to);
     assert.equal(JSON.stringify(simulation.world), eventsBefore);
-    assert.deepEqual(await post('return', { agentId: 'agent-sofia', selectionPolicy: 'important' }), sofiaBefore);
+    const sofiaAfterAnaConfirmation = await post('return', { agentId: 'agent-sofia', selectionPolicy: 'important' });
+    assert.deepEqual(sofiaAfterAnaConfirmation.result, sofiaBefore.result);
+    assert.deepEqual(sofiaAfterAnaConfirmation.presentation, sofiaBefore.presentation);
     const later = await post('return', { agentId: 'agent-ana', selectionPolicy: 'important' });
     assert.equal(later.result.totalEvents, 2);
     assert.match(later.presentation.complete, /19:40/);

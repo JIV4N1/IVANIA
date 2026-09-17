@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IVANIA · Propuesta visual 01</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101c26; color: #f0e4c5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1480px; margin: auto; padding: clamp(20px, 4vw, 64px); }
+    .eyebrow { color: #69c6b6; font-size: .8rem; text-transform: uppercase; letter-spacing: .15em; }
+    h1 { margin: 12px 0; font-size: clamp(2rem, 5vw, 3.8rem); font-weight: 650; letter-spacing: -.04em; }
+    h2 { font-weight: 600; font-size: 1.25rem; }
+    p { line-height: 1.65; max-width: 76ch; color: #c0c8c5; }
+    a { color: #8dd9cb; text-underline-offset: 4px; }
+    a:focus-visible { outline: 3px solid #e6b776; outline-offset: 5px; }
+    .notice { border-left: 3px solid #e6b776; padding: 12px 18px; background: #1b2a34; margin: 24px 0 36px; }
+    figure { margin: 0; }
+    .art-link { display: block; }
+    img { display: block; max-width: 100%; height: auto; border: 1px solid #38545a; }
+    figcaption { font-size: .9rem; line-height: 1.6; color: #afbbb8; margin-top: 12px; }
+    .narrow { display: grid; grid-template-columns: minmax(220px, 420px) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); align-items: start; margin-top: 56px; }
+    .notes { position: sticky; top: 24px; }
+    ul { padding-left: 20px; color: #c0c8c5; line-height: 1.8; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
+    .swatches span { width: 36px; height: 36px; border: 1px solid #638080; background: var(--color); }
+    footer { border-top: 1px solid #30464e; margin-top: 48px; padding-top: 20px; }
+    @media (max-width: 700px) { .narrow { grid-template-columns: 1fr; } .notes { position: static; } .narrow figure { max-width: 420px; margin: auto; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Dirección visual · Fase 1 · Para aprobación</div>
+    <h1>IVANIA, entre árboles.</h1>
+    <p>Una localidad lateral de pixel art cálido: tres lugares reconocibles, un suelo continuo y personajes pequeños dentro de un mundo que ocupa la pantalla.</p>
+    <p class="notice"><strong>Maquetas visuales.</strong> Los controles dentro de las imágenes están dibujados y no funcionan. Esta galería está aislada de la aplicación actual. Pulsa una imagen para verla a tamaño completo.</p>
+    <section aria-labelledby="desktop-title">
+      <h2 id="desktop-title">Escritorio · El mundo como protagonista</h2>
+      <figure>
+        <a class="art-link" href="desktop.png" aria-label="Abrir propuesta de escritorio a tamaño completo">
+          <img src="desktop.png" alt="Propuesta de IVANIA de vista lateral: Casa de tejado de teja a la izquierda, Cafetería con toldo turquesa en el centro y Trabajo de ladrillo a la derecha, unidos por césped, árboles y cercas. Ana y Sofía están separadas ante la Cafetería. HUD compacto y resumen recogido en las esquinas.">
+        </a>
+        <figcaption>Casa · Cafetería · Trabajo. Escena de tarde con capas de montañas y arbolado. El resumen permanece recogido; seleccionando a Ana se muestra una ficha pequeña.</figcaption>
+      </figure>
+    </section>
+    <section class="narrow" aria-labelledby="mobile-title">
+      <figure>
+        <a class="art-link" href="mobile.png" aria-label="Abrir propuesta de pantalla estrecha a tamaño completo">
+          <img src="mobile.png" alt="Propuesta estrecha de IVANIA: cámara centrada en la Cafetería y ambas agentes; HUD arriba y hoja de resumen en la parte inferior con intervalo, política, actividades y acciones distintas para consultar y confirmar.">
+        </a>
+        <figcaption>Adaptación estrecha: se ve una ventana del mundo, no toda la localidad reducida. El resumen abierto ocupa la parte inferior.</figcaption>
+      </figure>
+      <div class="notes">
+        <h2 id="mobile-title">Pantalla estrecha · Cámara y hoja inferior</h2>
+        <p>La cámara conserva la escala de los personajes. Arrastrar permitirá explorar la localidad; centrar recuperará la ubicación seleccionada. Abrir el resumen no cambia el estado del mundo ni captura un nuevo corte.</p>
+        <ul>
+          <li>Ana: cabello corto y chaqueta turquesa.</li>
+          <li>Sofía: coleta oscura, ciruela y ocre.</li>
+          <li>Tiles de 16 px; personajes de 16 × 32 px.</li>
+          <li>Escala entera; textos HTML legibles e independientes.</li>
+          <li>Solo reposo decorativo y cambios de ubicación instantáneos.</li>
+        </ul>
+        <div class="swatches" aria-label="Paleta: tinta, pino, salvia, turquesa, teja, ámbar, crema y lavanda">
+          <span style="--color:#152431" title="#152431 — tinta"></span><span style="--color:#264d48" title="#264d48 — pino"></span><span style="--color:#67916b" title="#67916b — salvia"></span><span style="--color:#69c6b6" title="#69c6b6 — turquesa"></span><span style="--color:#b8664e" title="#b8664e — teja"></span><span style="--color:#e6b776" title="#e6b776 — ámbar"></span><span style="--color:#f0e4c5" title="#f0e4c5 — crema"></span><span style="--color:#9b8ac5" title="#9b8ac5 — lavanda"></span>
+        </div>
+        <p><strong>Assets separados en Phaser:</strong> terreno, edificios, vegetación, fondos, personajes y cámara. <strong>HTML/CSS:</strong> HUD, selección, fichas, resumen y acciones.</p>
+        <p>Las imágenes definen la intención artística; no son spritesheets listos para producción. La implementación utilizará piezas originales a resolución nativa, nunca esta captura como fondo único con botones falsos.</p>
+        <p><a href="README.md">Leer escala, interacciones, plan de assets y límites</a><br><a href="prompts.md">Ver los prompts y la procedencia de las imágenes</a></p>
+      </div>
+    </section>
+    <footer>
+      <p>No hay cambios en la interfaz productiva, dependencias ni lógica. La siguiente fase queda pendiente de aprobación visual.</p>
+    </footer>
+  </main>
+</body>
+</html>

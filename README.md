@@ -41,7 +41,7 @@ JSON; POST requiere `Content-Type: application/json`, máximo 8 KiB. Sin caché.
 
 | Método / ruta | Cuerpo | Respuesta |
 | --- | --- | --- |
-| GET `/api/state` | — | `{moment, agents:[{id,name,location,lastConnection}]}`; registro ausente: `null` |
+| GET `/api/state` | — | `{moment, agents:[{id,name,locationId,location,lastConnection}]}`; registro ausente: `null` |
 | POST `/api/advance` | `{minutes:5\|60\|480}` | Estado visible actualizado; ticks calculados con `MINUTES_PER_TICK` del núcleo |
 | POST `/api/departure` | `{agentId}` | Registra el reloj actual; devuelve estado visible |
 | POST `/api/return` | `{agentId,selectionPolicy:"important"\|"balanced"}` | `{status:"ready",result,presentation:{brief,complete},state}`; `result` es el resultado acotado existente sin cambios |
@@ -57,6 +57,7 @@ npm.cmd run build
 npm.cmd run build:frontend
 npm.cmd test
 npm.cmd run test:http
+npm.cmd --prefix frontend run test:map
 npm.cmd run demo:activity -- --scenario diurno
 npm.cmd run demo:activity -- --scenario nocturno
 npm.cmd run demo:activity -- --scenario varios-dias --selection balanced
@@ -68,4 +69,27 @@ Los comandos originales de desarrollo, build, pruebas y demos se conservan. `tes
 
 ## Límites
 
-Estado exclusivamente en memoria: recargar el navegador conserva el mundo pero descarta la vista local del resumen; reiniciar el servidor reinicia reloj, mundo, eventos y registros. Avance únicamente manual, sin timers, polling, sincronización continua, WebSockets ni dependencia de la presencia del navegador. No hay autenticación: es un prototipo para la máquina local. La confirmación es explícita, sin sesiones, tokens ni almacenamiento de consultas. La interfaz se actualiza al cargar y tras cada acción, no al actuar desde otra pestaña. Phaser y Colyseus quedan para otros incrementos.
+Estado exclusivamente en memoria: recargar el navegador conserva el mundo pero descarta la vista local del resumen; reiniciar el servidor reinicia reloj, mundo, eventos y registros. Avance únicamente manual, sin timers de simulación, polling, sincronización continua, WebSockets ni dependencia de la presencia del navegador. No hay autenticación: es un prototipo para la máquina local. La confirmación es explícita, sin sesiones, tokens ni almacenamiento de consultas. La interfaz se actualiza al cargar y tras cada acción, no al actuar desde otra pestaña. Colyseus queda para otro incremento.
+
+## Escena Phaser
+
+Phaser 4.2.1 representa Casa (`home`), Cafetería (`cafe`) y Trabajo (`work`) mediante Graphics y texto, sin assets externos. `locationId` se añade al DTO conservando el nombre legible `location`. Las coordenadas son exclusivamente visuales y están en `frontend/src/world/worldLayout.ts`. Ana y Sofía tienen slots fijos por ID; un ID de ubicación desconocido utiliza el área «Ubicación no representada».
+
+`WorldMap` carga Phaser de forma diferida y crea un puente local por montaje. React envía agentes y selección; la escena retiene el último estado hasta `create()` y repinta instantáneamente. No consulta HTTP, importa el motor ni avanza ticks. El bucle de render de Phaser no cambia ubicaciones. El resumen conserva su propio intervalo histórico aunque el mapa reciba un estado actual nuevo.
+
+La limpieza cancela la inicialización pendiente, desconecta ResizeObserver, libera las referencias y llama a `game.destroy(true)` (destrucción diferida de Phaser). Cada montaje tiene un padre DOM propio que se retira inmediatamente para evitar canvases viejos visibles durante remontajes. El root actual no usa StrictMode; la limpieza también contempla su secuencia setup-cleanup-setup. La escala FIT conserva proporciones y el listado HTML mantiene nombres, ubicaciones y selección accesibles.
+
+Pruebas de posiciones: `npm.cmd --prefix frontend run test:map` (Node con soporte de TypeScript stripping, verificado en 24.11.0). El lockfile solo añade Phaser y su dependencia eventemitter3. Referencia de APIs: [Game.destroy](https://docs.phaser.io/api-documentation/class/game#destroy) y [Scale Manager](https://docs.phaser.io/phaser/concepts/scale-manager); también se revisaron los tipos y el código de la versión instalada. Vite puede advertir del tamaño del chunk de Phaser, que se carga separado de React.
+
+### Comprobación manual del mapa
+
+Iniciar ambos procesos con los comandos anteriores y abrir `http://127.0.0.1:5173`. Si estaban activos antes de añadir `locationId`, reiniciar el backend (esto reinicia su estado en memoria).
+
+1. Al cargar: ver Casa, Cafetería, Trabajo y ambos agentes en Cafetería; comprobar un único canvas con `document.querySelectorAll('.world-canvas canvas').length`.
+2. Cambiar Ana/Sofía: comprobar borde y etiqueta «Seleccionado», tanto en el canvas como en HTML. Los dos marcadores deben permanecer separados.
+3. Registrar salida, avanzar y consultar. Contrastar el mapa/listado con `locationId` en la respuesta de `/api/state` o `/api/advance` del panel Network.
+4. Avanzar de nuevo: el mapa cambia si el backend cambia ubicación; el resumen conserva intervalo, política y texto. Alternar breve/completo y confirmar el corte mostrado.
+5. Revisar en escritorio y a 375 px de ancho: sin scroll horizontal, etiquetas y controles accesibles. Revisar la consola por errores nuevos.
+6. En una comprobación de desarrollo, envolver temporalmente el root en React StrictMode y remontar `WorldMap`: al estabilizarse debe haber un solo canvas. Probar desmontar antes de acabar la carga inicial y montar otra vez; verificar ausencia de canvases y listeners residuales.
+
+La inspección visual no pudo ejecutarse en el entorno de automatización: no se detectó ningún navegador conectado. Estos pasos, la consola y el ciclo real de remontaje siguen pendientes de verificación visual; los builds y las pruebas automatizadas no los sustituyen.

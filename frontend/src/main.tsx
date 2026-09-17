@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { request, type Moment, type Policy, type ReadySummary, type ReturnResponse, type VisibleState } from './api';
 import './styles.css';
+import { WorldMap } from './world/WorldMap';
 
 const time = (m: Moment) => `${String(m.hour).padStart(2, '0')}:${String(m.minute).padStart(2, '0')}`;
 const moment = (m: Moment) => `Día ${m.day} · ${time(m)}`;
@@ -101,6 +102,7 @@ function App() {
           <p className="hint">El tiempo solo avanza al usar estos controles.</p>
         </section></aside>
         <section className="summary-area" aria-label="Regreso del agente">
+          <WorldMap state={state} selectedId={agentId} />
           <div className="query-toolbar"><div><label htmlFor="policy">Próximo resumen</label>
             <select id="policy" value={policy} disabled={busy} onChange={e => setPolicy(e.target.value as Policy)}>
               <option value="important">Más importantes</option><option value="balanced">Equilibrado</option>

@@ -1,0 +1,13 @@
+.world-map{padding:20px;margin-bottom:24px;min-width:0;overflow:hidden}
+.world-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.world-heading h2{font-size:21px}
+.world-map>.hint{margin:10px 0 16px}
+.world-canvas{width:100%;aspect-ratio:12/7;position:relative;overflow:hidden;border-radius:10px}
+.world-canvas-parent{position:absolute;inset:0}
+.world-canvas canvas{display:block;max-width:100%}
+.world-agents{list-style:none;padding:0;margin:16px 0 0;display:flex;flex-wrap:wrap;gap:10px}
+.world-agents li{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;border:1px solid #34465a;border-radius:9px;padding:10px 12px;font-size:12px;flex:1;min-width:0}
+.world-agents li.is-selected{border:2px solid #cbe9e5;padding:9px 11px}
+.world-agents li span{color:#a4b8cd;overflow-wrap:anywhere}
+.world-agents li small{color:#7de0d3;flex-basis:100%;font-size:10px}
+@media(max-width:680px){.world-map{padding:14px}.world-heading{flex-wrap:wrap}.world-heading .eyebrow{font-size:9px}.world-agents li{flex-basis:100%}}

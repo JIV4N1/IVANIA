@@ -51,7 +51,7 @@ export function createSimulationServer(
     ({ day: clock.getDay(), hour: clock.getHour(), minute: clock.getMinute() });
   const state = () => ({
     moment: now(),
-    agents: world.agents.map(agent => ({ id: agent.id, name: agent.name,
+    agents: world.agents.map(agent => ({ id: agent.id, name: agent.name, locationId: agent.locationId,
       location: world.getLocationById(agent.locationId)?.name ?? agent.locationId,
       lastConnection: connections.get(agent.id) ?? null })),
   });

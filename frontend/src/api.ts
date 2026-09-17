@@ -3,7 +3,7 @@ export interface Moment { day: number; hour: number; minute: number }
 export type Policy = 'important' | 'balanced';
 export interface VisibleState {
   moment: Moment;
-  agents: { id: string; name: string; location: string; lastConnection: Moment | null }[];
+  agents: { id: string; name: string; location: string; locationId: string; lastConnection: Moment | null }[];
 }
 export interface SummaryItem {
   type: string; title: string; description: string; importance: number; eventIds: string[];
