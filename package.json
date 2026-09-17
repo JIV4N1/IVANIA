@@ -4,12 +4,18 @@
   "description": "IVANIA simulación social autónoma",
   "main": "index.js",
   "scripts": {
+    "server": "tsx src/server/server.ts",
+    "frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "test:http": "tsx src/server/testServer.ts",
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
     "build": "tsc",
     "start:prod": "node dist/index.js",
     "test": "tsx src/simulation/runTests.ts",
-    "demo:activity": "tsx src/activity/demoActivitySummary.ts"
+    "demo:activity": "tsx src/activity/demoActivitySummary.ts",
+    "demo:activity-session": "tsx src/activity/demoActivitySession.ts",
+    "demo:activity-two-agents": "tsx src/activity/demoActivityTwoAgents.ts"
   },
   "keywords": [],
   "author": "",

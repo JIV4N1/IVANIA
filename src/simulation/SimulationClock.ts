@@ -1,5 +1,5 @@
 /** Minutos simulados que avanza cada llamada a tick() */
-const MINUTES_PER_TICK = 5;
+export const MINUTES_PER_TICK = 5;
 
 /** Total de minutos en un día simulado (24 h × 60 min) */
 const MINUTES_PER_DAY = 24 * 60;

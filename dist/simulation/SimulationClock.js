@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SimulationClock = void 0;
+exports.SimulationClock = exports.MINUTES_PER_TICK = void 0;
 /** Minutos simulados que avanza cada llamada a tick() */
-const MINUTES_PER_TICK = 5;
+exports.MINUTES_PER_TICK = 5;
 /** Total de minutos en un día simulado (24 h × 60 min) */
 const MINUTES_PER_DAY = 24 * 60;
 class SimulationClock {
@@ -25,7 +25,7 @@ class SimulationClock {
      */
     tick() {
         // Convertimos todo a minutos dentro del día, sumamos y descomponemos
-        const totalMinutes = this.hour * 60 + this.minute + MINUTES_PER_TICK;
+        const totalMinutes = this.hour * 60 + this.minute + exports.MINUTES_PER_TICK;
         this.day += Math.floor(totalMinutes / MINUTES_PER_DAY);
         this.hour = Math.floor((totalMinutes % MINUTES_PER_DAY) / 60);
         this.minute = totalMinutes % 60;

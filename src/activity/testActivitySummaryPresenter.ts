@@ -118,7 +118,8 @@ export function runActivitySummaryPresenterTests(): void {
   assert.match(diagnostic.output[1], /Selección breve: 8 seleccionados \| 14 no seleccionados/);
   assert.match(fullDiagnostic.output[1], /Modo mostrado: completo/);
   assert.match(fullDiagnostic.output[1], /Presentación actual: 22 mostrados \| 0 omitidos/);
-  assert.match(fullDiagnostic.output[1], /Selección breve: 8 seleccionados \| 14 no seleccionados/);
+  assert.match(fullDiagnostic.output[1], /Política: important \(no se aplica al modo completo\)/);
+  assert(!fullDiagnostic.output[1].includes('Selección breve:'));
   assert.equal((plain.output[0].match(/conversación/g) ?? []).length, 4);
   assert.equal((full.output[0].match(/conversación/g) ?? []).length, 4);
   assert.equal((full.output[0].match(/17:05 \|/g) ?? []).length, 2);
